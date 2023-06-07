@@ -1,0 +1,114 @@
+[
+    {
+        "_id": "648088f5e36e433d69884bc3",
+        "name": "Basketball Academy",
+        "instructor": "John Smith",
+        "image": "https://media.istockphoto.com/id/613759048/photo/portrait-of-sports-teacher-using-digital-tablet.jpg?s=612x612&w=0&k=20&c=rGgRTfjmMoYl4L3ybSaIvES4-D9cCQYvxk80FqSynR4=",
+        "email": "john.smith@example.com",
+        "numClassesTaken": 10,
+        "classesTaken": [
+            "Basketball",
+            "Strength Training"
+        ],
+        "numStudents": 30,
+        "ratings": 4.5,
+        "likes": 15,
+        "about": "The Basketball Academy offers comprehensive training programs for all skill levels, from beginners to advanced players. Our experienced instructor, John Smith, focuses on developing fundamental basketball skills, improving strength and agility, and enhancing overall game performance. Join us to take your basketball skills to the next level!"
+    },
+    {
+        "_id": "648088f5e36e433d69884bc4",
+        "name": "Soccer Academy",
+        "instructor": "Sarah Johnson",
+        "image": "https://media.istockphoto.com/id/1334046740/photo/portrait-of-happy-female-physical-education-teacher-at-school-gym.jpg?s=612x612&w=0&k=20&c=T7YBaXWBab9VoyiR4Aum3KkrFG4EXsKB7QouRl_8bK0=",
+        "email": "sarah.johnson@example.com",
+        "numClassesTaken": 8,
+        "classesTaken": [
+            "Soccer",
+            "Agility Training"
+        ],
+        "numStudents": 25,
+        "ratings": 4.2,
+        "likes": 12,
+        "about": "At the Soccer Academy, we provide top-notch soccer training for individuals of all ages and skill levels. Join our instructor, Sarah Johnson, an experienced coach, to improve your soccer techniques, enhance your agility, and boost your overall performance on the field. Whether you're a beginner or an advanced player, we have the right program to help you achieve your goals!"
+    },
+    {
+        "_id": "648088f5e36e433d69884bc5",
+        "name": "Swimming Academy",
+        "instructor": "Michael Davis",
+        "image": "https://britishswimschool.com/city-of-boston/wp-content/uploads/sites/78/2021/02/Private-Swimming-Lessons-in-Boston-MA.jpg",
+        "email": "michael.davis@example.com",
+        "numClassesTaken": 20,
+        "classesTaken": [
+            "Swimming",
+            "Water Safety"
+        ],
+        "numStudents": 40,
+        "ratings": 4.7,
+        "likes": 18,
+        "about": "Dive into the world of swimming at our Swimming Academy, led by instructor Michael Davis. We offer a wide range of swimming programs for beginners, intermediate swimmers, and competitive athletes. Whether you want to learn basic swimming skills or improve your technique and water safety knowledge, our academy is the perfect place for you. Join us and become a confident and skilled swimmer!"
+    },
+    {
+        "_id": "648088f5e36e433d69884bc6",
+        "name": "Tennis Academy",
+        "instructor": "Lisa Anderson",
+        "image": "https://media.istockphoto.com/id/172928490/photo/baseball-coach.jpg?s=612x612&w=0&k=20&c=SyDsRQaM-5fCU7K0WUcun8ScjH2YU1MUny_bUZ-FXcA=",
+        "email": "lisa.anderson@example.com",
+        "numClassesTaken": 20,
+        "classesTaken": [
+            "Tennis",
+            "Footwork Drills"
+        ],
+        "numStudents": 35,
+        "ratings": 4.5,
+        "likes": 20,
+        "about": "Join our Tennis Academy, guided by instructor Lisa Anderson, to master the art of tennis. Whether you're a beginner or an advanced player, our academy offers comprehensive tennis programs to enhance your skills, improve footwork, and develop strategic gameplay. Learn from experienced professionals in a supportive environment and take your tennis game to new heights!"
+    },
+    {
+        "_id": "648088f5e36e433d69884bc7",
+        "name": "Gymnastics Academy",
+        "instructor": "Emily Roberts",
+        "image": "https://hips.hearstapps.com/hmg-prod/images/mh-trainer-2-1533576998.png?resize=1200:*",
+        "email": "emily.roberts@example.com",
+        "numClassesTaken": 20,
+        "classesTaken": [
+            "Gymnastics",
+            "Floor Routines"
+        ],
+        "numStudents": 50,
+        "ratings": 4.9,
+        "likes": 25,
+        "about": "Discover the beauty of gymnastics at our Gymnastics Academy, led by instructor Emily Roberts. Whether you're a beginner or an advanced gymnast, we offer comprehensive training programs to develop your strength, flexibility, and artistic expression. From basic skills to intricate floor routines, our academy provides a nurturing environment to help you excel in the captivating world of gymnastics."
+    },
+    {
+        "_id": "648088f5e36e433d69884bc8",
+        "name": "Volleyball Academy",
+        "instructor": "Jason Thompson",
+        "image": "https://media.istockphoto.com/id/613759048/photo/portrait-of-sports-teacher-using-digital-tablet.jpg?s=612x612&w=0&k=20&c=rGgRTfjmMoYl4L3ybSaIvES4-D9cCQYvxk80FqSynR4=",
+        "email": "jason.thompson@example.com",
+        "numClassesTaken": 5,
+        "classesTaken": [
+            "Volleyball",
+            "Serve Techniques"
+        ],
+        "numStudents": 20,
+        "ratings": 4,
+        "likes": 10,
+        "about": "Experience the thrill of volleyball at our Volleyball Academy, guided by instructor Jason Thompson. Whether you're a beginner learning the basics or an advanced player looking to refine your skills, our academy offers comprehensive training programs. From serving techniques to team strategies, join us to enhance your volleyball abilities and enjoy the dynamic sport with a supportive community!"
+    },
+    {
+        "_id": "648088f5e36e433d69884bc9",
+        "name": "Baseball Academy",
+        "instructor": "Samantha Reed",
+        "image": "https://media.istockphoto.com/id/613759048/photo/portrait-of-sports-teacher-using-digital-tablet.jpg?s=612x612&w=0&k=20&c=rGgRTfjmMoYl4L3ybSaIvES4-D9cCQYvxk80FqSynR4=",
+        "email": "samantha.reed@example.com",
+        "numClassesTaken": 18,
+        "classesTaken": [
+            "Baseball",
+            "Pitching Fundamentals"
+        ],
+        "numStudents": 45,
+        "ratings": 4.3,
+        "likes": 16,
+        "about": "Join our Baseball Academy, led by instructor Samantha Reed, to hone your baseball skills and develop a deep understanding of the game. Our academy offers comprehensive programs for players of all levels, from beginners to advanced athletes. Learn the fundamentals, improve your pitching technique, and refine your overall gameplay in a supportive and inspiring environment."
+    }
+]
