@@ -26,6 +26,22 @@ async function run() {
         // Connect the client to the server	(optional starting in v4.7)
         await client.connect();
 
+        // const classesCollection = client.db('summerPlay').collection('classes')
+        const classesCollection = client.db('summerPlay').collection('classes')
+        const instructorsCollection = client.db('summerPlay').collection('instructors')
+        const reviewsCollection = client.db('summerPlay').collection('reviews')
+        
+        // Classes Data
+        app.get('/classes', async(req, res) => {
+            try {
+                const result = await classesCollection.find().sort({availableSeats:1}).toArray();
+                res.send(result)
+            }
+            catch (error) {
+
+            }
+        })
+
         
         
         // Send a ping to confirm a successful connection
