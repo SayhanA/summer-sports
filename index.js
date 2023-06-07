@@ -42,6 +42,17 @@ async function run() {
             }
         })
 
+        // Instructor Data
+        app.get('/instructor', async(req, res) => {
+            try {
+                const result = await instructorsCollection.find().sort({availableSeats:1}).toArray();
+                res.send(result)
+            }
+            catch (error) {
+
+            }
+        })
+
         
         
         // Send a ping to confirm a successful connection
