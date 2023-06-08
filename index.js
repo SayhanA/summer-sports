@@ -53,7 +53,17 @@ async function run() {
             }
         })
 
-
+        app.get('/instructor/:name', async(req, res) => {
+            try{
+                const name = req.params.name;
+                const query = {instructor: name};
+                const result = await classesCollection.find(query).toArray();
+                res.send(result)
+            }
+            catch(error){
+                console.log(error)
+            }
+        })
 
         // Reviews Data
         app.get('/reviews', async(req, res) => {
