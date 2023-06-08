@@ -53,7 +53,18 @@ async function run() {
             }
         })
 
-        
+
+
+        // Reviews Data
+        app.get('/reviews', async(req, res) => {
+            try {
+                const result = await reviewsCollection.find().sort({availableSeats:1}).toArray();
+                res.send(result)
+            }
+            catch (error) {
+
+            }
+        })
         
         // Send a ping to confirm a successful connection
         await client.db("admin").command({ ping: 1 });
