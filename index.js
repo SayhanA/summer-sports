@@ -53,6 +53,20 @@ async function run() {
             res.send(result)
         })
         
+        app.patch('/users/admin/:id', async(req, res) => {
+            const id = req.params.id;
+            const role = req.query.role;
+            const filter = { _id: new ObjectId(id)};
+            const updateDoc = {
+                $set: {
+                    role: role
+                },
+            };
+
+            const result = await usersCollection.updateOne(filter, updateDoc);
+            res.send(result)
+        })
+        
         
         // Classes Data
         app.get('/classes', async(req, res) => {
