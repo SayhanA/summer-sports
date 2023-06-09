@@ -1,6 +1,7 @@
 const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 const express = require('express');
 const cors = require('cors');
+const jwt = require('jsonwebtoken');
 require('dotenv').config();
 const app = express()
 const port = process.env.PORT || 5000;
@@ -10,6 +11,26 @@ const uri = `mongodb+srv://${process.env.S3_BUCKET}:${process.env.SECRET_KEY}@cl
 app.use(cors());
 app.use(express.json());
 
+const verifyJWT = (req, res, next) => {
+    const authorization = req.headers.authorization;
+    if (!authorization) {
+        return res.status(401).send({ error: true, message: 'unauthorized access' });
+    }
+
+    // if user send a token in header
+    const token = authorization.split(' ')[1];
+
+    jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, decoded) => {
+        if (err) {
+            return res.status(401).send({ error: true, message: 'unauthorized access' });
+        }
+
+        req.decoded = decoded;
+        next();
+
+    })
+
+}
 
 
 // Create a MongoClient with a MongoClientOptions object to set the Stable API version
@@ -32,31 +53,37 @@ async function run() {
         const instructorsCollection = client.db('summerPlay').collection('instructors')
         const reviewsCollection = client.db('summerPlay').collection('reviews')
         const cartCollection = client.db('summerPlay').collection('carts')
-        
 
+
+        app.post('/jwt', (req, res) => {
+            const user = req.body;
+            const token = jwt.sign(user, process.env.ACCESS_TOKEN_SECRET, { expiresIn: '1h' })
+
+            res.send({ token })
+        })
 
         // users related api
-        app.get('/users', async(req, res) => {
+        app.get('/users', async (req, res) => {
             const result = await usersCollection.find().toArray()
             res.send(result);
         })
-        
-        app.post('/users', async(req, res) => {
+
+        app.post('/users', async (req, res) => {
             const user = req.body;
             // console.log(user);
-            const query = {email: user.email}
+            const query = { email: user.email }
             const existingUser = await usersCollection.findOne(query);
-            if(existingUser){
-                return res.send({message: 'user already exist'})
+            if (existingUser) {
+                return res.send({ message: 'user already exist' })
             }
             const result = await usersCollection.insertOne(user);
             res.send(result)
         })
-        
-        app.patch('/users/admin/:id', async(req, res) => {
+
+        app.patch('/users/admin/:id', async (req, res) => {
             const id = req.params.id;
             const role = req.query.role;
-            const filter = { _id: new ObjectId(id)};
+            const filter = { _id: new ObjectId(id) };
             const updateDoc = {
                 $set: {
                     role: role
@@ -66,12 +93,18 @@ async function run() {
             const result = await usersCollection.updateOne(filter, updateDoc);
             res.send(result)
         })
-        
-        
+
+        app.delete('/users/:id', async (req, res) => {
+            const id = req.params.id;
+            const query = { _id: new ObjectId(id) };
+            const result = await usersCollection.deleteOne(query);
+            res.send(result);
+        })
+
         // Classes Data
-        app.get('/classes', async(req, res) => {
+        app.get('/classes', async (req, res) => {
             try {
-                const result = await classesCollection.find().sort({availableSeats:1}).toArray();
+                const result = await classesCollection.find().sort({ availableSeats: 1 }).toArray();
                 res.send(result)
             }
             catch (error) {
@@ -80,9 +113,9 @@ async function run() {
         })
 
         // Instructor Data
-        app.get('/instructor', async(req, res) => {
+        app.get('/instructor', async (req, res) => {
             try {
-                const result = await instructorsCollection.find().sort({availableSeats:1}).toArray();
+                const result = await instructorsCollection.find().sort({ availableSeats: 1 }).toArray();
                 res.send(result)
             }
             catch (error) {
@@ -90,22 +123,22 @@ async function run() {
             }
         })
 
-        app.get('/instructor/:name', async(req, res) => {
-            try{
+        app.get('/instructor/:name', async (req, res) => {
+            try {
                 const name = req.params.name;
-                const query = {instructor: name};
+                const query = { instructor: name };
                 const result = await classesCollection.find(query).toArray();
                 res.send(result)
             }
-            catch(error){
+            catch (error) {
                 console.log(error)
             }
         })
 
         // Reviews Data
-        app.get('/reviews', async(req, res) => {
+        app.get('/reviews', async (req, res) => {
             try {
-                const result = await reviewsCollection.find().sort({availableSeats:1}).toArray();
+                const result = await reviewsCollection.find().sort({ availableSeats: 1 }).toArray();
                 res.send(result)
             }
             catch (error) {
@@ -115,17 +148,24 @@ async function run() {
 
 
         // cart collection apis
-        app.get('/carts', async (req, res) => {
+        app.get('/carts', verifyJWT, async (req, res) => {
             const email = req.query.email;
             console.log(email)
-            if(!email){
+            if (!email) {
                 res.send([]);
             }
+
+            const decodedEmail = req.decoded.email;
+            console.log(decodedEmail);
+            if (email !== decodedEmail) {
+                return res.status(403).send({ error: true, message: 'Forbidden Access' });
+            }
+
             const query = { email: email };
             const result = await cartCollection.find(query).toArray();
             res.send(result)
         })
-        
+
         app.post('/carts', async (req, res) => {
             const item = req.body;
             console.log(item);
@@ -133,13 +173,13 @@ async function run() {
             res.send(result);
         })
 
-        app.delete('/carts/:id', async(req, res) => {
+        app.delete('/carts/:id', async (req, res) => {
             const id = req.params.id;
-            const query = { _id: new ObjectId(id)};
+            const query = { _id: new ObjectId(id) };
             const result = await cartCollection.deleteOne(query);
             res.send(result)
         })
-        
+
         // Send a ping to confirm a successful connection
         await client.db("admin").command({ ping: 1 });
         console.log("Pinged your deployment. You successfully connected to MongoDB!");
