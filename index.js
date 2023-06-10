@@ -62,8 +62,19 @@ async function run() {
             res.send({ token })
         })
 
+        // Use VerifyAdmin after VerifyJWT token
+        const verifyAdmin = async (req, res, next) => {
+            const email = req.decoded.email;
+            const query = { email: email }
+            const user = await usersCollection.findOne(query);
+            if (user?.role !== 'admin') {
+                return res.status(403).send({ error: true, message: 'forbidden access user is not admin' })
+            }
+            next();
+        }
+
         // users related api
-        app.get('/users', async (req, res) => {
+        app.get('/users', verifyJWT, verifyAdmin, async (req, res) => {
             const result = await usersCollection.find().toArray()
             res.send(result);
         })
@@ -82,14 +93,14 @@ async function run() {
 
 
         // Checking user is admin or not
-        app.get('/users/admin/:email', verifyJWT, async(req, res) => {
+        app.get('/users/admin/:email', verifyJWT, async (req, res) => {
             const email = req.params.email;
 
-            if(req.decoded.email !== email){
-                res.send({admin: false})
+            if (req.decoded.email !== email) {
+                res.send({ admin: false })
             }
-            
-            const query = {email: email}
+
+            const query = { email: email }
             const user = await usersCollection.findOne(query);
             const result = { admin: user?.role === "admin" }
             res.send(result)
