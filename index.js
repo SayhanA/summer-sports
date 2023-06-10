@@ -141,13 +141,31 @@ async function run() {
             }
         })
         
-        // TODO: Create Verify instructor midleware 
+        // TODO: Create Verify instructor midfdleware 
         app.post('/classes', verifyJWT, async(req, res) => {
             const newClass = req.body;
             const result = await classesCollection.insertOne(newClass)
             res.send(result)
         })
 
+        app.patch('/classes/admin/:id', async (req, res) => {
+            const id = req.params.id;
+            const status = req.query.role;
+
+            console.log("classes admin panel",id, status)
+            
+            const filter = { _id: new ObjectId(id) };
+            const updateDoc = {
+                $set: {
+                    status: status
+                },
+            };
+
+            const result = await classesCollection.updateOne(filter, updateDoc);
+            res.send(result)
+        })
+        
+        
         // Instructor Data
         app.get('/instructor', async (req, res) => {
             try {
