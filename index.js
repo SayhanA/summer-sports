@@ -73,6 +73,8 @@ async function run() {
             next();
         }
 
+        // TODO: Create user VerifyInstructor and use if after VerifyJWT token
+        
         // users related api
         app.get('/users', verifyJWT, verifyAdmin, async (req, res) => {
             const result = await usersCollection.find().toArray()
@@ -137,6 +139,13 @@ async function run() {
             catch (error) {
 
             }
+        })
+        
+        // TODO: Create Verify instructor midleware 
+        app.post('/classes', verifyJWT, async(req, res) => {
+            const newClass = req.body;
+            const result = await classesCollection.insertOne(newClass)
+            res.send(result)
         })
 
         // Instructor Data
