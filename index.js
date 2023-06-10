@@ -1,9 +1,10 @@
 const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 const express = require('express');
 const cors = require('cors');
-const jwt = require('jsonwebtoken');
+const jwt = require('jsonwebtoken');    
 require('dotenv').config();
 const app = express()
+const stripe = require('stripe')(process.env.PAYMENT_SECRET_KEY)
 const port = process.env.PORT || 5000;
 const uri = `mongodb+srv://${process.env.S3_BUCKET}:${process.env.SECRET_KEY}@cluster0.u2hpa9s.mongodb.net/?retryWrites=true&w=majority`;
 
@@ -165,6 +166,12 @@ async function run() {
             res.send(result)
         })
         
+        app.delete('/classes/:id', verifyJWT, verifyAdmin, async (req, res) => {
+            const id = req.params.id;
+            const query = { _id: new ObjectId(id) };
+            const result = await classesCollection.deleteOne(query);
+            res.send(result);
+        })
         
         // Instructor Data
         app.get('/instructor', async (req, res) => {
