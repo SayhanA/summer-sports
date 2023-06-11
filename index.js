@@ -125,6 +125,21 @@ async function run() {
             res.send(result)
         })
 
+        // Verify Instructor middleware
+        app.get('/users/instructor/:email', verifyJWT, async (req, res) => {
+            const email = req.params.email;
+
+            if (req.decoded.email !== email) {
+                res.send({ admin: false })
+            }
+
+            const query = { email: email }
+            const user = await usersCollection.findOne(query);
+            const result = { admin: user?.role === "instructor" }
+            res.send(result)
+
+        })
+
         app.delete('/users/:id', async (req, res) => {
             const id = req.params.id;
             const query = { _id: new ObjectId(id) };
@@ -188,10 +203,14 @@ async function run() {
             })
         })
         
-        app.post('/payment', async(req, res) => {
+        app.post('/payment', verifyJWT, async(req, res) => {
             const payment = req.body;
-            const result = await paymentCollection.insertOne(payment)
-            res.send(result)
+            const insertResult = await paymentCollection.insertOne(payment)
+
+            const query = {_id: { $in: payment.cartItems.map(id => new ObjectId(id) ) }}
+            const deleteResult = await cartCollection.deleteMany(query)
+
+            res.send({insertResult, deleteResult})
         })
         
         // Instructor Data
