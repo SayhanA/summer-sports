@@ -15,7 +15,7 @@ app.use(express.json());
 const verifyJWT = (req, res, next) => {
     const authorization = req.headers.authorization;
     if (!authorization) {
-        return res.status(401).send({ error: true, message: 'unauthorized access' });
+        return res.status(401-1).send({ error: true, message: 'unauthorized access header is empty' });
     }
 
     // if user send a token in header
@@ -101,7 +101,7 @@ async function run() {
             const email = req.params.email;
 
             if (req.decoded.email !== email) {
-                res.send({ admin: false })
+                return res.send({ admin: false })
             }
 
             const query = { email: email }
@@ -124,13 +124,14 @@ async function run() {
             const result = await usersCollection.updateOne(filter, updateDoc);
             res.send(result)
         })
+        
 
         // Verify Instructor middleware
         app.get('/users/instructor/:email', verifyJWT, async (req, res) => {
             const email = req.params.email;
 
             if (req.decoded.email !== email) {
-                res.send({ admin: false })
+                return res.send({ admin: false })
             }
 
             const query = { email: email }
@@ -157,9 +158,16 @@ async function run() {
 
             }
         })
+
+        app.get('/classes/:email', async(req, res) => {
+            const email = req.params.email;
+            const query = {email: email};
+            const result = await classesCollection.find(query).sort({ date: -1 }).toArray()
+            res.send(result)
+        })
         
         // TODO: Create Verify instructor midfdleware 
-        app.post('/classes', verifyJWT, async(req, res) => {
+        app.post('/classes',  async(req, res) => {
             const newClass = req.body;
             const result = await classesCollection.insertOne(newClass)
             res.send(result)
@@ -205,12 +213,29 @@ async function run() {
         
         app.post('/payment', verifyJWT, async(req, res) => {
             const payment = req.body;
+            // console.log(payment);
+            // const { _id } = payment;
             const insertResult = await paymentCollection.insertOne(payment)
 
-            const query = {_id: { $in: payment.cartItems.map(id => new ObjectId(id) ) }}
-            const deleteResult = await cartCollection.deleteMany(query)
+            const query = {_id: new ObjectId(payment.id)}
+            const deleteResult = await cartCollection.deleteOne(query)
 
-            res.send({insertResult, deleteResult})
+            // update available seats
+            const filter = {_id: new ObjectId(payment.classId)}
+            console.log(filter)
+            const update = { $set: { availableSeats: parseInt(payment.availableSeats) - 1 } };
+            console.log(update)
+            const UpdateResult = await classesCollection.updateOne(filter, update);
+            console.log(UpdateResult)
+
+            res.send({insertResult, deleteResult, UpdateResult})
+        })
+        
+        app.get('/payment/history/:email', async(req, res) => {
+            const email = req.params.email;
+            const query = {email: email};
+            const result = await paymentCollection.find(query).sort({ data: -1 }).toArray();
+            res.send(result)
         })
         
         // Instructor Data
@@ -253,7 +278,7 @@ async function run() {
             const email = req.query.email;
             console.log(email)
             if (!email) {
-                res.send([]);
+                return res.send([]);
             }
 
             const decodedEmail = req.decoded.email;
