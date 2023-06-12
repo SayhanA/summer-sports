@@ -46,7 +46,7 @@ const client = new MongoClient(uri, {
 async function run() {
     try {
         // Connect the client to the server	(optional starting in v4.7)
-        await client.connect();
+        // await client.connect();
 
         // const classesCollection = client.db('summerPlay').collection('classes')
         const usersCollection = client.db('summerPlay').collection('users')
@@ -260,6 +260,11 @@ async function run() {
             res.send(result)
         })
 
+        app.get('/payment', async(req, res) => {
+            const result = await paymentCollection.find().toArray()
+            res.send(result)
+        })
+
         // Instructor Data
         app.get('/instructor', async (req, res) => {
             try {
@@ -328,6 +333,27 @@ async function run() {
             res.send(result)
         })
 
+        // Admin
+        app.get('/admin-stats', async( req, res) => {
+            const users = await usersCollection.estimatedDocumentCount();
+            const classes = await classesCollection.estimatedDocumentCount();
+            const orders = await paymentCollection.estimatedDocumentCount();
+
+            const payments = await paymentCollection.find().toArray();
+            const revenue = payments.reduce( (sum, entry) => sum + entry.price ,0)
+
+            res.send({
+                users,
+                classes,
+                orders,
+                revenue,
+            })
+        })
+        
+
+        
+        
+
         // Send a ping to confirm a successful connection
         await client.db("admin").command({ ping: 1 });
         console.log("Pinged your deployment. You successfully connected to MongoDB!");
@@ -346,3 +372,7 @@ app.get('/', (req, res) => {
 app.listen(port, () => {
     console.log(`Your server is running on PORT: ${port}`)
 })
+
+
+
+// https://b7a12-summer-camp-server-side-sayhan-a.vercel.app
