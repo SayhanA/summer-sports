@@ -1,7 +1,7 @@
 const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 const express = require('express');
 const cors = require('cors');
-const jwt = require('jsonwebtoken');    
+const jwt = require('jsonwebtoken');
 require('dotenv').config();
 const app = express()
 const stripe = require('stripe')(process.env.PAYMENT_SECRET_KEY)
@@ -15,7 +15,7 @@ app.use(express.json());
 const verifyJWT = (req, res, next) => {
     const authorization = req.headers.authorization;
     if (!authorization) {
-        return res.status(401-1).send({ error: true, message: 'unauthorized access header is empty' });
+        return res.status(401 - 1).send({ error: true, message: 'unauthorized access header is empty' });
     }
 
     // if user send a token in header
@@ -76,7 +76,7 @@ async function run() {
         }
 
         // TODO: Create user VerifyInstructor and use if after VerifyJWT token
-        
+
         // users related api
         app.get('/users', verifyJWT, verifyAdmin, async (req, res) => {
             const result = await usersCollection.find().toArray()
@@ -106,6 +106,7 @@ async function run() {
 
             const query = { email: email }
             const user = await usersCollection.findOne(query);
+            
             const result = { admin: user?.role === "admin" }
             res.send(result)
 
@@ -124,7 +125,7 @@ async function run() {
             const result = await usersCollection.updateOne(filter, updateDoc);
             res.send(result)
         })
-        
+
 
         // Verify Instructor middleware
         app.get('/users/instructor/:email', verifyJWT, async (req, res) => {
@@ -149,9 +150,14 @@ async function run() {
         })
 
         // Classes Data
+        app.get('/classes/all', async (req, res) => {
+            const query = { status: "approve" }
+            const result = await classesCollection.find(query).sort({ availableSeats: 1 }).toArray();
+            res.send(result)
+        })
         app.get('/classes', async (req, res) => {
             try {
-                const result = await classesCollection.find().sort({ availableSeats: 1 }).toArray();
+                const result = await classesCollection.find().sort({ date: -1 }).toArray();
                 res.send(result)
             }
             catch (error) {
@@ -159,15 +165,15 @@ async function run() {
             }
         })
 
-        app.get('/classes/:email', async(req, res) => {
+        app.get('/classes/:email', async (req, res) => {
             const email = req.params.email;
-            const query = {email: email};
+            const query = { email: email };
             const result = await classesCollection.find(query).sort({ date: -1 }).toArray()
             res.send(result)
         })
-        
+
         // TODO: Create Verify instructor midfdleware 
-        app.post('/classes',  async(req, res) => {
+        app.post('/classes', async (req, res) => {
             const newClass = req.body;
             const result = await classesCollection.insertOne(newClass)
             res.send(result)
@@ -176,20 +182,36 @@ async function run() {
         app.patch('/classes/admin/:id', async (req, res) => {
             const id = req.params.id;
             const status = req.query.role;
+            const feedback = req.query.data;
 
-            console.log("classes admin panel",id, status)
-            
+            if (feedback) {
+                console.log(feedback)
+                const filter = { _id: new ObjectId(id) };
+                console.log(filter)
+                const updateDoc = {
+                    $set: {
+                        status: status,
+                        feedback: feedback
+                    },
+                };
+
+                const result = await classesCollection.updateOne(filter, updateDoc);
+                return res.send(result)
+            }
+
+            console.log("classes admin panel", id, status)
+
             const filter = { _id: new ObjectId(id) };
             const updateDoc = {
                 $set: {
-                    status: status
+                    status: status,
                 },
             };
 
             const result = await classesCollection.updateOne(filter, updateDoc);
             res.send(result)
         })
-        
+
         app.delete('/classes/:id', verifyJWT, verifyAdmin, async (req, res) => {
             const id = req.params.id;
             const query = { _id: new ObjectId(id) };
@@ -198,9 +220,9 @@ async function run() {
         })
 
         // Create payment intent
-        app.post('/create-payment-intent', verifyJWT, async(req, res) => {
+        app.post('/create-payment-intent', verifyJWT, async (req, res) => {
             const { price } = req.body;
-            const amount = price*100;
+            const amount = price * 100;
             const paymentIntent = await stripe.paymentIntents.create({
                 amount: amount,
                 currency: 'usd',
@@ -210,34 +232,34 @@ async function run() {
                 ClientSecret: paymentIntent.client_secret
             })
         })
-        
-        app.post('/payment', verifyJWT, async(req, res) => {
+
+        app.post('/payment', verifyJWT, async (req, res) => {
             const payment = req.body;
             // console.log(payment);
             // const { _id } = payment;
             const insertResult = await paymentCollection.insertOne(payment)
 
-            const query = {_id: new ObjectId(payment.id)}
+            const query = { _id: new ObjectId(payment.id) }
             const deleteResult = await cartCollection.deleteOne(query)
 
             // update available seats
-            const filter = {_id: new ObjectId(payment.classId)}
+            const filter = { _id: new ObjectId(payment.classId) }
             console.log(filter)
             const update = { $set: { availableSeats: parseInt(payment.availableSeats) - 1 } };
             console.log(update)
             const UpdateResult = await classesCollection.updateOne(filter, update);
             console.log(UpdateResult)
 
-            res.send({insertResult, deleteResult, UpdateResult})
+            res.send({ insertResult, deleteResult, UpdateResult })
         })
-        
-        app.get('/payment/history/:email', async(req, res) => {
+
+        app.get('/payment/history/:email', async (req, res) => {
             const email = req.params.email;
-            const query = {email: email};
+            const query = { email: email };
             const result = await paymentCollection.find(query).sort({ data: -1 }).toArray();
             res.send(result)
         })
-        
+
         // Instructor Data
         app.get('/instructor', async (req, res) => {
             try {
